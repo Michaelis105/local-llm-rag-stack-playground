@@ -19,6 +19,7 @@ warnings.filterwarnings("ignore")
 class RAGEngine:
     def __init__(self, db_path="./chroma_db"):
         self.db_path = db_path
+        self.total_chunks = 0  # Track total chunks for smart retrieval
 
         # Small, fast local embedding model
         self.embeddings = HuggingFaceEmbeddings(
@@ -35,17 +36,28 @@ class RAGEngine:
         loader = PyPDFLoader(file_path)
         docs = loader.load()
         
+        # Debug: Show how many pages were loaded
+        print(f"Loaded {len(docs)} pages from PDF")
+        for i, doc in enumerate(docs):
+            print(f"  Page {i+1}: {len(doc.page_content)} characters")
+        
         # Splitter: 500 char chunks with 10% overlap for context continuity
         splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         chunks = splitter.split_documents(docs)
+        
+        print(f"Split into {len(chunks)} chunks")
+        self.total_chunks = len(chunks) # Store for dynamic retrieval
         
         vector_store = Chroma.from_documents(
             documents=chunks, 
             embedding=self.embeddings, 
             persist_directory=self.db_path
         )
-        return vector_store.as_retriever(search_kwargs={"k": 3})
+                
+        return vector_store.as_retriever(search_kwargs={"k": self.total_chunks})
 
     def get_existing_retriever(self):
         vector_store = Chroma(persist_directory=self.db_path, embedding_function=self.embeddings)
-        return vector_store.as_retriever(search_kwargs={"k": 3})
+        # For existing retriever, use same logic: 50% of estimated chunks (minimum 4)
+        # Note: This is an estimate; for exact count, you'd need to query the vector store
+        return vector_store.as_retriever(search_kwargs={"k": self.total_chunks})

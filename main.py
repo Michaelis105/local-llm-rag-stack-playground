@@ -10,7 +10,7 @@ if sys.platform == "win32":
     import types
     sys.modules["pwd"] = types.ModuleType("pwd")
 
-def format_docs(docs):
+def format_docs(docs):    
     return "\n\n".join(doc.page_content for doc in docs)
 
 def run_pipeline(pdf_path, user_query):
