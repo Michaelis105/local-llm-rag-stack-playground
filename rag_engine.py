@@ -15,7 +15,6 @@ from langchain_chroma import Chroma
 # Suppress HuggingFace/LangChain deprecation warnings for cleaner output
 warnings.filterwarnings("ignore")
 
-
 class RAGEngine:
     def __init__(self, db_path="./chroma_db"):
         self.db_path = db_path
