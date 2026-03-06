@@ -1,18 +1,32 @@
 import os
+import sys
 import warnings
+
+# Still highly recommend the mock just in case other sub-packages trigger it
+if sys.platform == "win32":
+    import types
+    sys.modules["pwd"] = types.ModuleType("pwd")
+
+from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
 
 # Suppress HuggingFace/LangChain deprecation warnings for cleaner output
 warnings.filterwarnings("ignore")
 
+
 class RAGEngine:
     def __init__(self, db_path="./chroma_db"):
         self.db_path = db_path
+
         # Small, fast local embedding model
-        self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        self.embeddings = HuggingFaceEmbeddings(
+            model_name="all-MiniLM-L6-v2",
+            model_kwargs={'device': 'cpu'},
+            encode_kwargs={'normalize_embeddings': False},
+            cache_folder="./models" # Stores the 90MB model locally in your repo
+        )
 
     def ingest_document(self, file_path):
         if not os.path.exists(file_path):

@@ -1,9 +1,9 @@
-from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 
 class LLMManager:
     def __init__(self, model_name="gemma3"):
-        self.llm = Ollama(model=model_name)
+        self.llm = OllamaLLM(model=model_name)
 
     def get_rag_prompt(self):
         system_prompt = (

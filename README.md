@@ -3,6 +3,8 @@ Playground experimenting with local LLM-based RAG stack
 
 # Setup
 
+Runs successfully on Python 3.11.9.
+
 ## Install Ollama
 
 ```
@@ -11,12 +13,6 @@ ollama run gemma3:270m
 ```
 
 ## Install Repo
-
-```
-pip install langchain langchain-community langchain-core chromadb sentence-transformers pypdf
-```
-
-OR
 
 ```
 pip install -r requirements.txt
